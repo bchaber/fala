@@ -1,6 +1,6 @@
 <p align="center">
   <img src="https://github.com/bchaber/fala/blob/main/logo.svg" width="256px" alt="A simple RLC circuit connected to form an equilateral triangle (or Laplace operator Δ = ∇² as in wave equation)"/>
-  <h1>fala</h1>
+  <h1>fala <a href="https://zenodo.org/badge/latestdoi/395087863"><img src="https://zenodo.org/badge/395087863.svg" alt="DOI"></a></h1>
 </p>
 
 fala is a Whitney element based, structured finite element method for electromagnetic simulations coupled with electrical circuits.
