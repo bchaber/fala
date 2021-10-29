@@ -208,7 +208,7 @@ diode_Parameters diode_P = {
    /* Parameter 'Amplitude' of
     *  Sine Wave Generator : 'diode/Sine Wave'
     */
-   5.,
+   1.,
    /* Parameter 'Bias' of
     *  Sine Wave Generator : 'diode/Sine Wave'
     */
