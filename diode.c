@@ -299,9 +299,9 @@ void diode_step(void)
 int main(int argc, char** argv) {
   int i;
   diode_initialize(0.0);
-  for(i=0; i<100; i++) {
+  for(i=0; i<501; i++) {
     diode_step();
-    printf("%g\t%g\n", diode_PM0_u[0], diode_PM0_y[1]);
+    printf("%g\t%g\t%g\t%g\n", diode_PM0_u[0], diode_PM0_u[1], diode_PM0_y[0], diode_PM0_y[1]);
   }
   return 0;
 }
