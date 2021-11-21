@@ -332,7 +332,7 @@ Plecs {
       TimeRange     "0.0"
       ScrollingMode "1"
       SingleTimeAxis "1"
-      Open          "1"
+      Open          "0"
       Ts            "-1"
       SampleLimit   "0"
       XAxisLabel    ""
@@ -1313,7 +1313,7 @@ Plecs {
       LabelAlign    up
       Parameter {
         Variable      "Value"
-        Value         "1e-3"
+        Value         "1e-5"
         Show          off
       }
       Parameter {
@@ -1443,12 +1443,12 @@ Plecs {
 "resistance = 876.0 * distance * pow(radius, 2.0/5.0) /\n"
 "\t\t\t\t\t\tpow(iintsq + 1e-24, 3.0/5.0);\n"
 "\n"
-"if (resistance > 1e18)\n"
-"\tresistance = 1e18;\n"
+"if (resistance > 1e10)\n"
+"\tresistance = 1e10;\n"
 "if (resistance < 1e-0)\n"
 "\tresistance = 1e-0;\n"
 "\t\n"
-"OutputSignal(0,0) = 100*resistance;"
+"OutputSignal(0,0) = resistance;"
         Show          off
       }
       Parameter {
@@ -1895,7 +1895,7 @@ Plecs {
 "if (inductance < 1)\n"
 "\tinductance = 1;\n"
 "\n"
-"OutputSignal(0,0) = 100e-9;// * inductance;"
+"OutputSignal(0,0) = 1e-9 * inductance;"
         Show          off
       }
       Parameter {
@@ -2086,7 +2086,7 @@ Plecs {
       TimeRange     "0.0"
       ScrollingMode "1"
       SingleTimeAxis "1"
-      Open          "0"
+      Open          "1"
       Ts            "-1"
       SampleLimit   "0"
       XAxisLabel    ""
@@ -2923,4 +2923,4 @@ Plecs {
     }
   }
 }
-DemoSignature "M8V4tulf67litsr8RNFnQm+Oo+W7qKzmc7jjHqv7rg0="
+DemoSignature "dCxEOK8yRJsxTz4smPe5h0CBzTxvd+ys0dUGkFgdbFI="
