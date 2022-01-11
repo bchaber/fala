@@ -19,32 +19,33 @@ struct DifferentiableModel{TA, TB, TC, TD, TDQ, TE, TEQ, TF, TFQ, TM}
     ū :: TM
     q̄ :: TM
     z :: TM
+    params :: Dict{String, Any}
 end
 
-function step!(m::DifferentiableModel, u, f=nothing, df=nothing)
+function step!(m::DifferentiableModel, u, f_nonlin=nothing, f_after=nothing)
     m.ū .= u
-    if !isnothing(f)
+    if !isnothing(f_nonlin)
         for _ in 1:500
             m.q̄ .= m.Dq * m.x̄;
             m.q̄.+= m.Eq * m.ū;
             m.q̄.+= m.Fq * m.z;
 
-            fq   =  f(m.q̄) # should be 0.0
-            dfdq = df(m.q̄)
+            fq, dfdq  =  f_nonlin(m.q̄, m.params)
             dqdz = m.Fq
 
             dz = (dfdq * dqdz) \ fq
             m.z.-= dz
-        end; println("Norm after nonlinear iterations: ", norm(f(m.q̄)))
+        end; println("Norm after nonlinear iterations: ", norm(f_nonlin(m.q̄, m.params)))
+        f_after(m.q̄, m.params)
     end
     
     m.y .= m.D * m.x̄;
     m.y.+= m.E * m.ū;
-    if !isnothing(f) m.y.+= m.F * m.z; end
+    if !isnothing(f_nonlin) m.y.+= m.F * m.z; end
  
     m.x̄ .= m.A * m.x̄;
     m.x̄.+= m.B * m.ū;
-    if !isnothing(f) m.x̄.+= m.C * m.z; end
+    if !isnothing(f_nonlin) m.x̄.+= m.C * m.z; end
 end
 
 function smatrix(A::Vector; T=Float64)
