@@ -35,7 +35,7 @@ function step!(m::DifferentiableModel, u, f_nonlin=nothing, f_after=nothing)
 
             dz = (dfdq * dqdz) \ fq
             m.z.-= dz
-        end; println("Norm after nonlinear iterations: ", norm(f_nonlin(m.q̄, m.params)))
+        end; #println("Norm after nonlinear iterations: ", norm(f_nonlin(m.q̄, m.params)))
         f_after(m.q̄, m.params)
     end
     
