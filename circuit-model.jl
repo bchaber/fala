@@ -25,7 +25,7 @@ end
 function step!(m::DifferentiableModel, u, f_nonlin=nothing, f_after=nothing)
     m.ū .= u
     if !isnothing(f_nonlin)
-        for _ in 1:500
+        for _ in 1:50
             m.q̄ .= m.Dq * m.x̄;
             m.q̄.+= m.Eq * m.ū;
             m.q̄.+= m.Fq * m.z;
