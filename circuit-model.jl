@@ -22,6 +22,28 @@ struct DifferentiableModel{TA, TB, TC, TD, TDQ, TE, TEQ, TF, TFQ, TM}
     params :: Dict{String, Any}
 end
 
+import Base
+function Base.copy(m::DifferentiableModel)
+    A = m.A
+    B = m.B
+    C = m.C
+    D = m.D
+    E = m.E
+    F = m.F
+    Dq, Eq, Fq = m.Dq, m.Eq, m.Fq
+    x̄, y, ū, q̄, z = m.x̄, m.y, m.ū, m.q̄, m.z
+    return DifferentiableModel(A, B, C, D, E, F,
+        Dq, Eq, Fq, x̄, y, ū, q̄, z, m.params)
+end
+
+function fix!(m::DifferentiableModel)
+    m.x̄ .= value.(m.x̄)
+    m.y .= value.(m.y)
+    m.ū .= value.(m.ū)
+    m.q̄ .= value.(m.q̄)
+    m.z .= value.(m.z)
+end
+
 function step!(m::DifferentiableModel, u, f_nonlin=nothing, f_after=nothing)
     m.ū .= u
     if !isnothing(f_nonlin)
