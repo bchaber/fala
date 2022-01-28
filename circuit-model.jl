@@ -33,7 +33,7 @@ function Base.copy(m::DifferentiableModel)
     Dq, Eq, Fq = m.Dq, m.Eq, m.Fq
     x̄, y, ū, q̄, z = m.x̄, m.y, m.ū, m.q̄, m.z
     return DifferentiableModel(A, B, C, D, E, F,
-        Dq, Eq, Fq, x̄, y, ū, q̄, z, m.params)
+        Dq, Eq, Fq, copy(x̄), copy(y), copy(ū), copy(q̄), copy(z), copy(m.params))
 end
 
 function fix!(m::DifferentiableModel)
@@ -47,7 +47,7 @@ end
 function step!(m::DifferentiableModel, u, f_nonlin=nothing, f_after=nothing)
     m.ū .= u
     if !isnothing(f_nonlin)
-        for _ in 1:50
+        for _ in 1:10
             m.q̄ .= m.Dq * m.x̄;
             m.q̄.+= m.Eq * m.ū;
             m.q̄.+= m.Fq * m.z;
@@ -57,6 +57,7 @@ function step!(m::DifferentiableModel, u, f_nonlin=nothing, f_after=nothing)
 
             dz = (dfdq * dqdz) \ fq
             m.z.-= dz
+            m.params["nonlinear"] = norm(fq)
         end; #println("Norm after nonlinear iterations: ", norm(f_nonlin(m.q̄, m.params)))
         f_after(m.q̄, m.params)
     end
@@ -68,6 +69,7 @@ function step!(m::DifferentiableModel, u, f_nonlin=nothing, f_after=nothing)
     m.x̄ .= m.A * m.x̄;
     m.x̄.+= m.B * m.ū;
     if !isnothing(f_nonlin) m.x̄.+= m.C * m.z; end
+    return m.y
 end
 
 function smatrix(A::Vector; T=Float64)
