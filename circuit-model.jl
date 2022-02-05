@@ -14,11 +14,11 @@ struct DifferentiableModel{TA, TB, TC, TD, TDQ, TE, TEQ, TF, TFQ, TM}
     Eq :: TEQ
     Fq :: TFQ
     # state
-    x̄ :: TM
-    y :: TM
-    ū :: TM
-    q̄ :: TM
-    z :: TM
+    x̄ :: Matrix{TM}
+    y :: Matrix{TM}
+    ū :: Matrix{TM}
+    q̄ :: Matrix{TM}
+    z :: Matrix{TM}
     params :: Dict{String, Any}
 end
 
@@ -36,39 +36,56 @@ function Base.copy(m::DifferentiableModel)
         Dq, Eq, Fq, copy(x̄), copy(y), copy(ū), copy(q̄), copy(z), copy(m.params))
 end
 
-function fix!(m::DifferentiableModel)
+function resetderivatives!(m::DifferentiableModel, ::Matrix{Float64})
+    nothing
+end
+
+function resetderivatives!(m::DifferentiableModel, ::Matrix{Dual{Float64}})
     m.x̄ .= value.(m.x̄)
     m.y .= value.(m.y)
     m.ū .= value.(m.ū)
     m.q̄ .= value.(m.q̄)
     m.z .= value.(m.z)
+    return nothing
 end
 
-function step!(m::DifferentiableModel, u, f_nonlin=nothing, f_after=nothing)
+function step!(m::DifferentiableModel, u)
+    resetderivatives!(m, m.y)
     m.ū .= u
-    if !isnothing(f_nonlin)
-        for _ in 1:10
-            m.q̄ .= m.Dq * m.x̄;
-            m.q̄.+= m.Eq * m.ū;
-            m.q̄.+= m.Fq * m.z;
+    
+    m.y .= m.D * m.x̄;
+    m.y.+= m.E * m.ū;
+ 
+    m.x̄ .= m.A * m.x̄;
+    m.x̄.+= m.B * m.ū;
+    
+    return m.y
+end
 
-            fq, dfdq  =  f_nonlin(m.q̄, m.params)
-            dqdz = m.Fq
+function step!(m::DifferentiableModel, u, fnl)
+    resetderivatives!(m, m.y)
+    m.ū .= u
+    
+    for _ in 1:10
+        m.q̄ .= m.Dq * m.x̄;
+        m.q̄.+= m.Eq * m.ū;
+        m.q̄.+= m.Fq * m.z;
 
-            dz = (dfdq * dqdz) \ fq
-            m.z.-= dz
-            m.params["nonlinear"] = norm(fq)
-        end; #println("Norm after nonlinear iterations: ", norm(f_nonlin(m.q̄, m.params)))
-        f_after(m.q̄, m.params)
+        fq, dfdq  = fnl(m.q̄, m.params)
+        dqdz = m.Fq
+
+        dz = (dfdq * dqdz) \ fq
+        m.z.-= dz
     end
     
     m.y .= m.D * m.x̄;
     m.y.+= m.E * m.ū;
-    if !isnothing(f_nonlin) m.y.+= m.F * m.z; end
+    m.y.+= m.F * m.z;
  
     m.x̄ .= m.A * m.x̄;
     m.x̄.+= m.B * m.ū;
-    if !isnothing(f_nonlin) m.x̄.+= m.C * m.z; end
+    m.x̄.+= m.C * m.z;
+    
     return m.y
 end
 
