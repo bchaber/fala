@@ -1,6 +1,10 @@
 using StaticArrays
 using LinearAlgebra
 
+struct LinearOnePortElement{T}
+    model :: T
+end
+
 struct DifferentiableModel{TA, TB, TC, TD, TDQ, TE, TEQ, TF, TFQ, TM}
     # linear
     A :: TA
@@ -23,6 +27,8 @@ struct DifferentiableModel{TA, TB, TC, TD, TDQ, TE, TEQ, TF, TFQ, TM}
 end
 
 import Base
+Base.copy(src::LinearOnePortElement) = LinearOnePortElement(copy(src.model))
+
 function Base.copy(m::DifferentiableModel)
     A = m.A
     B = m.B
