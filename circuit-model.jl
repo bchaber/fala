@@ -41,11 +41,11 @@ function resetderivatives!(m::DifferentiableModel, ::Matrix{Float64})
 end
 
 function resetderivatives!(m::DifferentiableModel, ::Matrix{Dual{Float64}})
-    m.x̄ .= value.(m.x̄)
-    m.y .= value.(m.y)
-    m.ū .= value.(m.ū)
-    m.q̄ .= value.(m.q̄)
-    m.z .= value.(m.z)
+    m.x̄ .= float.(m.x̄)
+    m.y .= float.(m.y)
+    m.ū .= float.(m.ū)
+    m.q̄ .= float.(m.q̄)
+    m.z .= float.(m.z)
     return nothing
 end
 
@@ -75,7 +75,7 @@ function step!(m::DifferentiableModel, u, fnl)
         dqdz = m.Fq
 
         dz = (dfdq * dqdz) \ fq
-        m.z.-= dz
+        m.z.-= float.(dz)
     end
     
     m.y .= m.D * m.x̄;
