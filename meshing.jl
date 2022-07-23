@@ -1,11 +1,14 @@
 # find edges in the mesh
 function triedgemake()
+    global EDGES
+    global NODE_EDGES
     global ELEMENTS
     global ELEMENT_EDGES
     global NUM_ELEMS
-    global EDGES
+    global NUM_NODES
     global NUM_EDGES
     global LOCALEDGENODES
+    NODE_EDGES = Dict{Tuple{Int64, Int64}, Int64}()
     EDGES = zeros(Int64, 3NUM_ELEMS, 2)
     EDGES[1, :] = [ELEMENTS[1,1], ELEMENTS[1,2]]
     EDGES[2, :] = [ELEMENTS[1,1], ELEMENTS[1,3]]
@@ -14,13 +17,14 @@ function triedgemake()
     ELEMENT_EDGES[1,1] = 1
     ELEMENT_EDGES[1,2] = 2
     ELEMENT_EDGES[1,3] = 3
-    TEMPEDGES = zeros(2)
+    TEMPEDGES = zeros(Int64, 2)
     edge_counter = 3
     
     for ielem = 2:NUM_ELEMS
        for jedge = 1:3
          TEMPEDGES .= [ELEMENTS[ielem, LOCALEDGENODES[jedge,1]],
                        ELEMENTS[ielem, LOCALEDGENODES[jedge,2]]]
+         sort!(TEMPEDGES)
          new_edge = true
          for kedge = 1:edge_counter
            if TEMPEDGES == EDGES[kedge, :]
@@ -38,6 +42,11 @@ function triedgemake()
     end
     NUM_EDGES = edge_counter
     EDGES = EDGES[1:NUM_EDGES, :] # trim EDGES matrix
+    for iedge = 1:NUM_EDGES
+        n = sort(EDGES[iedge, :])
+        NODE_EDGES[n[1], n[2]] = +iedge
+        NODE_EDGES[n[2], n[1]] = -iedge
+    end
     return nothing
 end
 
